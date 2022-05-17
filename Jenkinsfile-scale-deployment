@@ -1,0 +1,33 @@
+pipeline {
+  agent any
+  environment {
+    FLY_API_TOKEN=credentials('fly-api-token')
+    FLY_APP="my-native-app"
+  }
+  stages {
+    stage('Verify tooling') {
+      steps {
+        sh '''
+          flyctl version
+        '''
+      }
+    }
+    stage('set regions') {
+      steps {
+        sh '''
+          flyctl regions set iad lhr
+        '''
+      }
+    }
+    stage('scale the deployment') {
+      steps {
+        sh 'flyctl scale count 2'
+      }
+    }
+    stage('verify deployment') {
+      steps {
+        sh 'flyctl status'
+      }
+    }
+  }
+}
